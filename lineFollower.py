@@ -95,17 +95,30 @@ class Follower:
     print("HI")
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    lower_yellow = numpy.array([ 100,  100,  100])
+
+    #randomly chosen values
+    lower_yellow = numpy.array([100,  100,  100])
     upper_yellow = numpy.array([255, 255, 250])
     #need to find the lowest and highest threshold for white lines
     #opencv rgb value
+
+    #if pixel value is in the range, it sets it to be white (255)
+    #else sets it to be black
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
+    #picks the part that we wanted detect
+    #numbers also randomly chosen
+    #aims to focus on the bottom part of image
     h, w, d = image.shape
     search_top = 4*h/5 + 10
     search_bot = 4*h/5 + 20
+    
+    #sets the pixels outside the range to be zero
     mask[0:search_top, 0:w] = 0
     mask[search_bot:h, 0:w] = 0
+
+    #function to find the center of the two detected lines??
+    #makes red dot in the middle
     M = cv2.moments(mask)
     print(M['m00'])
     if M['m00'] > 0:
