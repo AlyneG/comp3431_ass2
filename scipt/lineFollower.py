@@ -131,7 +131,7 @@ class Follower:
   def scan_callback(self, data):
       global start
       data.ranges = list(data.ranges)
-      # only detect front 180 degree sector
+      # only detect front 60 degree sector
       for i in range(30, 330):
         data.ranges[i] = 0
 
