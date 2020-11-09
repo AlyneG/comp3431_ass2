@@ -97,7 +97,7 @@ class Follower:
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     #randomly chosen values
-    lower_yellow = numpy.array([100,  100,  100])
+    lower_yellow = numpy.array([0,  0,  0])
     upper_yellow = numpy.array([255, 255, 250])
     #need to find the lowest and highest threshold for white lines
     #opencv rgb value
@@ -141,8 +141,8 @@ class Follower:
       #self.twist.linear.x = 0
       #self.twist.angular.z = 0
       #self.cmd_vel_pub.publish(self.twist)
-    # cv2.imshow("window", image)
-    # cv2.waitKey(3)
+    cv2.imshow("window", mask)
+    cv2.waitKey(3)
 
 rospy.init_node('follower')
 follower = Follower()
