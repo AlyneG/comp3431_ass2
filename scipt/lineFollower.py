@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import rospy, cv2, cv_bridge, numpy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
 import time
+from detectStop import detectStop
+
+start = True
 
 def stop_sign_detection(img_in):
     """Finds the centroid coordinates of a stop sign in the provided
@@ -27,7 +30,6 @@ def stop_sign_detection(img_in):
     search_bot = int(3*h/6 - 40)
     edges[0:search_top, 0:w] = 0
     edges[search_bot:h, 0:w] = 0
-
 
     edges_indices = numpy.where(edges[:,:] > 0)
     if(len(edges_indices) < 2):
@@ -91,36 +93,25 @@ class Follower:
     self.count = 0
 
   def image_callback(self, msg):
-
-    print("HI")
+    global start
+    if not start: return
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
+    #detectStop(image)
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     #randomly chosen values
     lower_yellow = numpy.array([0,  100,  0])
     upper_yellow = numpy.array([255, 255, 250])
-    #need to find the lowest and highest threshold for white lines
-    #opencv rgb value
-
-    #if pixel value is in the range, it sets it to be white (255)
-    #else sets it to be black
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
-    #picks the part that we wanted detect
-    #numbers also randomly chosen
-    #aims to focus on the bottom part of image
     h, w, d = image.shape
     search_top = 4*h/5 + 10
     search_bot = 4*h/5 + 20
-    
-    #sets the pixels outside the range to be zero
     mask[0:search_top, 0:w] = 0
     mask[search_bot:h, 0:w] = 0
-
-    #function to find the center of the two detected lines??
-    #makes red dot in the middle
     M = cv2.moments(mask)
-    print(M['m00'])
+    cv2.imshow("mask", mask)
+
     if M['m00'] > 0:
       cx = int(M['m10']/M['m00'])
       cy = int(M['m01']/M['m00'])
@@ -129,20 +120,39 @@ class Follower:
       self.twist.linear.x = 0.1
       self.twist.angular.z = -float(err) / 100
       #print(-float(err) / 60)
-      print("Hello")
       self.cmd_vel_pub.publish(self.twist)
       print(self.twist)
     #print('HAHA')
     #center, h = stop_sign_detection(image)
     #cv2.circle(image, center, 20, (0,255,0), -1)
     #if(center[0] != 0 and center[1] != 0):
-     #print('I should stop')
+    #  print('I should stop')
       #time.sleep(5)
       #self.twist.linear.x = 0
       #self.twist.angular.z = 0
       #self.cmd_vel_pub.publish(self.twist)
-    cv2.imshow("window", mask)
+    cv2.imshow("window", image)
     cv2.waitKey(3)
+
+  def scan_callback(self, data):
+      global start
+      data.ranges = list(data.ranges)
+      # only detect front 60 degree sector
+      for i in range(30, 330):
+        data.ranges[i] = 0
+
+      # the closest object
+      self.data = min([i for i in data.ranges if i != 0])
+      
+      start = True
+
+      # if someting in front of the robot 0.2M, stop moving
+      if start and self.data < 0.2:
+          start = False
+          self.twist.linear.x = 0
+          self.twist.angular.z = 0
+          self.cmd_vel_pub.publish(self.twist)
+          return
 
 rospy.init_node('follower')
 follower = Follower()
