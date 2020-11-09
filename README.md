@@ -5,7 +5,7 @@
 $ roslaunch turtlebot3_gazebo self_driving.launch
 
 ### Terminal 2:
-$ cd catkin_ws/src/comp3431-ass2 <br/>
+$ cd ~/catkin_ws/src/comp3431-ass2 <br/>
 $ python lineFollower.py
 
 ## How to run the edge detection:
