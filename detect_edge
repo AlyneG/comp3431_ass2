@@ -14,7 +14,6 @@ from turtlebot3_autorace_detect.cfg import DetectLaneParamsConfig
 
 class DetectEdge():
     def __init__(self):
-        print("I am being initialised")
         self.sub_image_type = "compressed"         # you can choose image type "compressed", "raw"
         self.pub_image_type = "compressed"  # you can choose image type "compressed", "raw"
 
