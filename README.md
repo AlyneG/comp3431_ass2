@@ -31,3 +31,19 @@ $ roslaunch comp3431-ass2 turtlebot3_autorace_detect_edge.launch
 ### Terminal 5: (To view the image being published)
 $ rqt_image_view </br> 
 *Change the topic to detect/image_lane/compressed*
+
+
+
+## How to run lineFollower, intersection & stopSign
+### New Terminal
+$ roslaunch turtlebot3_gazebo self_driving.launch
+
+### New Terminal
+$ python newLineFollower.py
+
+### New Terminal
+$ python intersection.py
+
+### New Terminal
+$ python stopSign.py
+
