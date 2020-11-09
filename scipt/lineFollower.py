@@ -87,6 +87,7 @@ class Follower:
     #cv2.namedWindow("window", 1)
     self.image_sub = rospy.Subscriber('camera/image',
                                       Image, self.image_callback)
+    self.scan_sub = rospy.Subscriber('scan', LaserScan, self.scan_callback)                      
     self.cmd_vel_pub = rospy.Publisher('cmd_vel',
                                        Twist, queue_size=1)
     self.twist = Twist()
@@ -143,7 +144,7 @@ class Follower:
 
       # the closest object
       self.data = min([i for i in data.ranges if i != 0])
-      
+
       start = True
 
       # if someting in front of the robot 0.2M, stop moving
