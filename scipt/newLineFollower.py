@@ -90,7 +90,7 @@ class Follower:
                                        Twist, queue_size=1)
     self.twist = Twist()
     self.count = 0
-    self.max_vel = 0.1
+    self.max_vel = 0.15
 
   
   def max_vel_callback(self, max_vel):
@@ -109,7 +109,7 @@ class Follower:
     #cv2.waitKey(3)
 
     h, w, d = image.shape
-    search_top = int(4*h/5+10)
+    search_top = int(4*h/5)
     search_bot = int(h)
     mask[0:search_top, 0:w] = 0
     mask[search_bot:h, 0:w] = 0
@@ -129,7 +129,7 @@ class Follower:
       cv2.circle(image, (cx, cy), 20, (0,0,255), -1)
       err = cx - w/2
       self.twist.linear.x = self.max_vel
-      self.twist.angular.z = -float(err) / 100
+      self.twist.angular.z = -float(err) / 70
       #print(-float(err) / 60)
       self.cmd_vel_pub.publish(self.twist)
     #print('HAHA')
@@ -141,8 +141,8 @@ class Follower:
       #self.twist.linear.x = 0
       #self.twist.angular.z = 0
       #self.cmd_vel_pub.publish(self.twist)
-    #cv2.imshow("window", mask)
-    #cv2.waitKey(3)
+    cv2.imshow("window", mask)
+    cv2.waitKey(3)
 
 rospy.init_node('follower')
 follower = Follower()
