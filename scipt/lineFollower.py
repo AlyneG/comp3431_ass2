@@ -6,6 +6,8 @@ import time
 from detectStop import detectStop
 
 start = True
+lower_real = [0,110,0]
+lower_gazebo = [0,0,0]
 
 def stop_sign_detection(img_in):
     """Finds the centroid coordinates of a stop sign in the provided
@@ -97,19 +99,33 @@ class Follower:
     global start
     if not start: return
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
+    #change perspective
+    rows, cols = image.shape[:2]
+    rows-=1
+    cols-=1
+    src_points = numpy.float32([[int(cols/3),int(rows*2/4)], [0,rows], [cols,rows],[int(cols*2/3),int(rows*2/4)]])
+    dst_points = numpy.float32([[0,0], [int(cols/6),rows], [int((cols)*5/6),rows],[cols,0]])
+    affine_matrix = cv2.getPerspectiveTransform(src_points, dst_points)
+    image = cv2.warpPerspective(image, affine_matrix, (cols+1,rows+1))
+
     #detectStop(image)
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     #randomly chosen values
-    lower_yellow = numpy.array([0,  100,  0])
+    lower_yellow = numpy.array(lower_gazebo)
     upper_yellow = numpy.array([255, 255, 250])
+
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
     h, w, d = image.shape
-    search_top = 4*h/5 + 10
+    search_top = 4*h/5 - 10
     search_bot = 4*h/5 + 20
-    mask[0:search_top, 0:w] = 0
+    temp_mask = 255 - mask
+    dilate = cv2.dilate(temp_mask,None, iterations=20)
+    temp_mask = cv2.erode(dilate,None, iterations=20)
+    mask = 255-temp_mask
     mask[search_bot:h, 0:w] = 0
+    mask[0:search_top, 0:w] = 0
     M = cv2.moments(mask)
     cv2.imshow("mask", mask)
 
@@ -119,19 +135,8 @@ class Follower:
       cv2.circle(image, (cx, cy), 20, (0,0,255), -1)
       err = cx - w/2
       self.twist.linear.x = 0.1
-      self.twist.angular.z = -float(err) / 100
-      #print(-float(err) / 60)
+      self.twist.angular.z = -float(err) / 70
       self.cmd_vel_pub.publish(self.twist)
-      print(self.twist)
-    #print('HAHA')
-    #center, h = stop_sign_detection(image)
-    #cv2.circle(image, center, 20, (0,255,0), -1)
-    #if(center[0] != 0 and center[1] != 0):
-    #  print('I should stop')
-      #time.sleep(5)
-      #self.twist.linear.x = 0
-      #self.twist.angular.z = 0
-      #self.cmd_vel_pub.publish(self.twist)
     cv2.imshow("window", image)
     cv2.waitKey(3)
 

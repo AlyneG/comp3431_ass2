@@ -1,0 +1,5 @@
+<!--This file is for real robot-->>
+<launch>
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+    <include file="$(find turtlebot3_autorace_camera)/launch/turtlebot3_autorace_camera_pi.launch"/>
+</launch>
