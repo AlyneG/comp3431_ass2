@@ -1,7 +1,8 @@
-<!--This file is for real robot-->>
+<!--This file is for gazebo-->
 <launch>
+    <include file="$(find turtlebot3_gazebo)/launch/self_driving.launch"/>
     <!--Connect to robot-->>
-    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch"/>">
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch"/>
     <!--Connect to autorace intrinsic camera-->
     <include file="$(find turtlebot3_autorace_camera )/launch/turtlebot3_autorace_intrinsic_camera_calibration.launch"/>
     <!--Connect to autorace entrinsic camera-->
