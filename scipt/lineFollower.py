@@ -3,8 +3,6 @@ import rospy, cv2, cv_bridge, numpy
 from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
 import time
-from detectStop import detectStop
-
 start = True
 lower_real = [0,110,0]
 lower_gazebo = [0,0,0]
@@ -103,39 +101,48 @@ class Follower:
     rows, cols = image.shape[:2]
     rows-=1
     cols-=1
-    src_points = numpy.float32([[int(cols/3),int(rows*2/4)], [0,rows], [cols,rows],[int(cols*2/3),int(rows*2/4)]])
-    dst_points = numpy.float32([[0,0], [int(cols/6),rows], [int((cols)*5/6),rows],[cols,0]])
+
+    src_points = numpy.float32([[int(cols*1.5/4),int(rows*4/7)],[int(cols*2.5/4), int(rows*4/7)],[0,rows], [cols,rows]])
+    dst_points = numpy.float32([[0,10],[cols,10], [int(cols*1/6),rows], [int((cols)*5/6),rows]])
     affine_matrix = cv2.getPerspectiveTransform(src_points, dst_points)
     image = cv2.warpPerspective(image, affine_matrix, (cols+1,rows+1))
+    image[image==0] = 255
+    '''
+    cv2.circle(image, (0, rows), 5, (0,0,255), -1)
+    cv2.circle(image, (cols, rows), 5, (0,0,255), -1)
+    cv2.circle(image, (int(cols*1.3/4), int(rows*4/7)), 5, (0,0,255), -1)
+    cv2.circle(image, (int(cols*2.7/4), int(rows*4/7)), 5, (0,0,255), -1)'''
 
     #detectStop(image)
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
+    #hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+  
     #randomly chosen values
-    lower_yellow = numpy.array(lower_gazebo)
-    upper_yellow = numpy.array([255, 255, 250])
+    #lower_yellow = numpy.array(lower_gazebo)
+    #upper_yellow = numpy.array([255, 255, 250])
 
-    mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
-
+    #mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _,mask = cv2.threshold(gray,100,255,cv2.THRESH_BINARY)
     h, w, d = image.shape
-    search_top = 4*h/5 - 10
-    search_bot = 4*h/5 + 20
-    temp_mask = 255 - mask
-    dilate = cv2.dilate(temp_mask,None, iterations=20)
-    temp_mask = cv2.erode(dilate,None, iterations=20)
-    mask = 255-temp_mask
+    search_top = int(9.97*h/10) - 5
+    search_bot = int(9.97*h/10) 
+    it = 40
+    dilate = cv2.dilate(mask,None, iterations=it)
+    mask = cv2.erode(dilate,None, iterations=it)
+    mask = 255 - mask
     mask[search_bot:h, 0:w] = 0
     mask[0:search_top, 0:w] = 0
-    M = cv2.moments(mask)
     cv2.imshow("mask", mask)
-
+    M = cv2.moments(mask)
+    #print(M)
+    ru = 1
     if M['m00'] > 0:
       cx = int(M['m10']/M['m00'])
       cy = int(M['m01']/M['m00'])
-      cv2.circle(image, (cx, cy), 20, (0,0,255), -1)
+      cv2.circle(image, (cx, cy), 5, (0,0,255), -1)
       err = cx - w/2
-      self.twist.linear.x = 0.1
-      self.twist.angular.z = -float(err) / 70
+      self.twist.linear.x = 0.1 * ru
+      self.twist.angular.z = -float(err) / 70 * ru
       self.cmd_vel_pub.publish(self.twist)
     cv2.imshow("window", image)
     cv2.waitKey(3)
