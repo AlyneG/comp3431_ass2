@@ -103,7 +103,7 @@ class Follower:
     cols-=1
 
     src_points = numpy.float32([[int(cols*1.5/4),int(rows*4/7)],[int(cols*2.5/4), int(rows*4/7)],[0,rows], [cols,rows]])
-    dst_points = numpy.float32([[0,10],[cols,10], [int(cols*1/6),rows], [int((cols)*5/6),rows]])
+    dst_points = numpy.float32([[0,10],[cols,10], [int(cols*1/7),rows], [int((cols)*6/7),rows]])
     affine_matrix = cv2.getPerspectiveTransform(src_points, dst_points)
     image = cv2.warpPerspective(image, affine_matrix, (cols+1,rows+1))
     image[image==0] = 255
@@ -133,6 +133,15 @@ class Follower:
     mask[search_bot:h, 0:w] = 0
     mask[0:search_top, 0:w] = 0
     cv2.imshow("mask", mask)
+    intersection = False
+    if(numpy.count_nonzero(mask == 255)<-10):
+      print("intersection!")
+      time.sleep(1)
+      self.twist.linear.x = 0.0
+      self.twist.angular.z = 0
+      self.cmd_vel_pub.publish(self.twist)
+      intersection = True
+
     M = cv2.moments(mask)
     #print(M)
     ru = 1
