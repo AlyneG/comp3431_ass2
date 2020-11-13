@@ -122,7 +122,7 @@ class Follower:
 
     #mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _,mask = cv2.threshold(gray,100,255,cv2.THRESH_BINARY)
+    _,mask = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)
     h, w, d = image.shape
     search_top = int(9.97*h/10) - 5
     search_bot = int(9.97*h/10) 
