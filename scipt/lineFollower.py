@@ -135,14 +135,17 @@ class Follower:
     mask[0:search_top, 0:w] = 0
     cv2.imshow("mask", mask)
     intersection = False
-    if(numpy.count_nonzero(mask == 255)<-10):
+    number = numpy.count_nonzero(mask == 255)
+    total = h*w*1.0
+    prop = number/total
+    #print(number,total,prop)
+    if(prop <= 0.06):
       print("intersection!")
-      time.sleep(1)
+      '''time.sleep(1)
       self.twist.linear.x = 0.0
       self.twist.angular.z = 0
       self.cmd_vel_pub.publish(self.twist)
-      intersection = True
-
+      intersection = True'''
     M = cv2.moments(mask)
     #print(M)
     ru = 1
