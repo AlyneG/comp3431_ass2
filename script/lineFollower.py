@@ -38,17 +38,15 @@ def stop_sign_detection(img_in):
     indices_y = edges_indices[1]
     if(len(indices_x) == 0 or len(indices_y) == 0):
       return (0,0), 0
-    #indices_x.sort()
-    #indices_y.sort()
+
     max_x = max(indices_x)
     min_x = min(indices_x)
     max_y = max(indices_y)
     min_y = min(indices_y)
-    #print(indices_x)
-    #print(indices_y)
+
     num_points = edges_indices[0].shape[0]
     theta = numpy.arange(0,360)*numpy.pi/180.0
-    #print(edges_indices)
+
     for edge_point in range(num_points):
         x = edges_indices[0][edge_point]
         y = edges_indices[1][edge_point]
@@ -112,16 +110,9 @@ class Follower:
     cv2.circle(image, (0, rows), 5, (0,0,255), -1)
     cv2.circle(image, (cols, rows), 5, (0,0,255), -1)
     cv2.circle(image, (int(cols*1.3/4), int(rows*4/7)), 5, (0,0,255), -1)
-    cv2.circle(image, (int(cols*2.7/4), int(rows*4/7)), 5, (0,0,255), -1)'''
+    cv2.circle(image, (int(cols*2.7/4), int(rows*4/7)), 5, (0,0,255), -1)
+    '''
 
-    #detectStop(image)
-    #hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-  
-    #randomly chosen values
-    #lower_yellow = numpy.array(lower_gazebo)
-    #upper_yellow = numpy.array([255, 255, 250])
-
-    #mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _,mask = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)
     h, w, d = image.shape
@@ -133,19 +124,6 @@ class Follower:
     mask = 255 - mask
     mask[search_bot:h, 0:w] = 0
     mask[0:search_top, 0:w] = 0
-    cv2.imshow("mask", mask)
-    intersection = False
-    number = numpy.count_nonzero(mask == 255)
-    total = h*w*1.0
-    prop = number/total
-    #print(number,total,prop)
-    if(prop <= 0.06):
-      print("intersection!")
-      '''time.sleep(1)
-      self.twist.linear.x = 0.0
-      self.twist.angular.z = 0
-      self.cmd_vel_pub.publish(self.twist)
-      intersection = True'''
     M = cv2.moments(mask)
     #print(M)
     ru = 1
@@ -157,7 +135,7 @@ class Follower:
       self.twist.linear.x = 0.1 * ru
       self.twist.angular.z = -float(err) / 70 * ru
       self.cmd_vel_pub.publish(self.twist)
-    cv2.imshow("window", image)
+    cv2.imshow("window", mask)
     cv2.waitKey(3)
 
   def scan_callback(self, data):
