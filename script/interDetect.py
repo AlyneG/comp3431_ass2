@@ -40,8 +40,20 @@ class Intersection:
         total = h*w*1.0
         prop = number/total
         #print(number,total,prop)
-        cv2.imshow("stop",mask)
-        if(prop <= 0.027 and prop >= 0.02):
+        #cv2.imshow("stop",mask)
+        font                   = cv2.FONT_HERSHEY_SIMPLEX
+        bottomLeftCornerOfText = (250,50)
+        fontScale              = 1
+        fontColor              = (255,255,255)
+        lineType               = 2
+        cv2.putText(mask,str(prop), 
+        bottomLeftCornerOfText, 
+        font, 
+        fontScale,
+        fontColor,
+        lineType)
+        cv2.imshow("window", mask)
+        if(prop <= 0.03 and prop >= 0.02):
             print(prop)
             self.pub.publish("yes")
             time.sleep(3)

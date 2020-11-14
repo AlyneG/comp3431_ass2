@@ -84,6 +84,7 @@ class Follower:
   def __init__(self):
     self.bridge = cv_bridge.CvBridge()
     #cv2.namedWindow("window", 1)
+    self.numImage = 0
     self.image_sub = rospy.Subscriber('camera/image', Image, self.image_callback)
     self.scan_sub = rospy.Subscriber('scan', LaserScan, self.scan_callback)  
     self.inter_sub = rospy.Subscriber('intersection', String, self.inter_callback)                    
@@ -125,7 +126,6 @@ class Follower:
     mask[0:search_top, 0:w] = 0
     M = cv2.moments(mask)
     image[:,:,]
-    #cv2.imshow("window", mask)
     '''intersection = self.intersectionDetect(mask)
     if(intersection):
       ru = 0
