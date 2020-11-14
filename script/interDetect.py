@@ -3,12 +3,14 @@
 import rospy, cv2, cv_bridge, numpy
 from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 import time
 
 class Intersection:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('camera/image', Image, self.intersection_detect)
+        self.pub = rospy.Publisher('intersection',String,queue_size=10)
     def intersection_detect(self, image):
         image = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         #change perspective
@@ -34,15 +36,22 @@ class Intersection:
         mask = 255 - mask
         mask[search_bot:h, 0:w] = 0
         mask[0:search_top, 0:w] = 0
-        number = numpy.count_nonzero(mask == 255)
+        number = numpy.count_nonzero(mask == 255)*1.0
         total = h*w*1.0
         prop = number/total
         #print(number,total,prop)
-        if(prop <= 0.055):
-            print("intersection!")
+        cv2.imshow("stop",mask)
+        if(prop <= 0.03 and prop >= 0.02):
+            print(prop)
+            self.pub.publish("yes")
+            time.sleep(3)
+            self.pub.publish("no")
+            time.sleep(10)
         else:
-            print("Normal")
-        cv2.imshow("window", mask)
+            self.pub.publish("no")
+
+        
+        #cv2.imshow("window", mask)
         cv2.waitKey(3)
 
 

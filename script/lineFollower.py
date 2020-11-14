@@ -2,6 +2,7 @@
 import rospy, cv2, cv_bridge, numpy
 from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 import time
 start = True
 lower_real = [0,110,0]
@@ -83,17 +84,15 @@ class Follower:
   def __init__(self):
     self.bridge = cv_bridge.CvBridge()
     #cv2.namedWindow("window", 1)
-    self.image_sub = rospy.Subscriber('camera/image',
-                                      Image, self.image_callback)
-    self.scan_sub = rospy.Subscriber('scan', LaserScan, self.scan_callback)                      
-    self.cmd_vel_pub = rospy.Publisher('cmd_vel',
-                                       Twist, queue_size=1)
+    self.image_sub = rospy.Subscriber('camera/image', Image, self.image_callback)
+    self.scan_sub = rospy.Subscriber('scan', LaserScan, self.scan_callback)  
+    self.inter_sub = rospy.Subscriber('intersection', String, self.inter_callback)                    
+    self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
     self.twist = Twist()
+    self.move = True
     self.count = 0
 
   def image_callback(self, msg):
-    global start
-    if not start: return
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
     #change perspective
     rows, cols = image.shape[:2]
@@ -118,25 +117,37 @@ class Follower:
     h, w, d = image.shape
     search_top = int(8.5*h/10)
     search_bot = int(h) 
-    it = 40
+    it = 30
     dilate = cv2.dilate(mask,None, iterations=it)
     mask = cv2.erode(dilate,None, iterations=it)
     mask = 255 - mask
     mask[search_bot:h, 0:w] = 0
     mask[0:search_top, 0:w] = 0
     M = cv2.moments(mask)
+    image[:,:,]
+    #cv2.imshow("window", mask)
+    '''intersection = self.intersectionDetect(mask)
+    if(intersection):
+      ru = 0
+    else:
+      ru = 1'''
     #print(M)
     ru = 1
+    if not self.move:
+      ru = 0
     if M['m00'] > 0:
       cx = int(M['m10']/M['m00'])
       cy = int(M['m01']/M['m00'])
       cv2.circle(image, (cx, cy), 4, (0,0,255), -1)
       err = cx - w/2
       self.twist.linear.x = 0.1 * ru
-      self.twist.angular.z = -float(err) / 70 * ru
+      self.twist.angular.z = -float(err) / 40 * ru
       self.cmd_vel_pub.publish(self.twist)
-    cv2.imshow("window", mask)
     cv2.waitKey(3)
+
+  def inter_callback(self,data):
+    self.move = data.data=='no'
+
 
   def scan_callback(self, data):
       global start
