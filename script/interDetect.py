@@ -41,7 +41,7 @@ class Intersection:
         prop = number/total
         #print(number,total,prop)
         cv2.imshow("stop",mask)
-        if(prop <= 0.03 and prop >= 0.02):
+        if(prop <= 0.027 and prop >= 0.02):
             print(prop)
             self.pub.publish("yes")
             time.sleep(3)
