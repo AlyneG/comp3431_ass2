@@ -43,10 +43,10 @@ class Intersection:
         #cv2.imshow("stop",mask)
         font                   = cv2.FONT_HERSHEY_SIMPLEX
         bottomLeftCornerOfText = (250,50)
-        fontScale              = 1
+        fontScale              = 0.7
         fontColor              = (255,255,255)
         lineType               = 2
-        cv2.putText(mask,str(prop), 
+        cv2.putText(mask,'{0:3f}'.format(prop), 
         bottomLeftCornerOfText, 
         font, 
         fontScale,

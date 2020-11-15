@@ -8,7 +8,7 @@
 
     <node pkg="comp3431_ass2" type="lineFollower.py" name="lineFollower" output="screen"/>
     <node pkg="comp3431_ass2" type="interDetect.py" name="intersectionDetect" output="screen"/>
-
+    <!--node pkg="comp3431_ass2" type="ellenIntersection.py" name="ellenIntersection" output="screen"/-->
     <!--node pkg="comp3431_ass2" type="intersection.py" name="intersection" output="screen"/-->
     <!--node pkg="comp3431_ass2" type="stopSign.py" name="stopSign" output="screen"/-->
     <!--node pkg="comp3431_ass2" type="color.py" name="color" output="screen"/-->
