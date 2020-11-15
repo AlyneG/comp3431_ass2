@@ -68,14 +68,14 @@ class Follower:
       self.twist.linear.x = 0.1 * ru
       self.twist.angular.z = -float(err) / 40 * ru
       self.cmd_vel_pub.publish(self.twist)
-    if(ru == 1):
+    '''if(ru == 1):
       os.chdir("/home/rsa/image/intersection/isInter")
       cv2.imwrite(str(self.countnointer)+".jpg", mask)
       self.countnointer += 1
     else:
       os.chdir("/home/rsa/image/intersection/notInter")
       cv2.imwrite(str(self.countinter)+".jpg", mask)
-      self.countinter+=1
+      self.countinter+=1'''
     cv2.waitKey(3)
 
   def inter_callback(self,data):

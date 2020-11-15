@@ -1,16 +1,23 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-import rospy, cv2, cv_bridge, numpy
+import rospy, cv_bridge, numpy
+import cv2
 from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
+from tensorflow.keras.models import load_model
 import time
-
+import os
+start = True
+lower_real = [0,110,0]
+lower_gazebo = [0,0,0]
 class Intersection:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('camera/image', Image, self.intersection_detect)
         self.pub = rospy.Publisher('intersection',String,queue_size=10)
+        print(os.getcwd())
+        self.model = load_model('/home/rsa/catkin_ws/src/comp3431_ass2/script/model/model.h5')
+
     def intersection_detect(self, image):
         image = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         #change perspective
@@ -36,34 +43,20 @@ class Intersection:
         mask = 255 - mask
         mask[search_bot:h, 0:w] = 0
         mask[0:search_top, 0:w] = 0
-        number = numpy.count_nonzero(mask == 255)*1.0
-        total = h*w*1.0
-        prop = number/total
         #print(number,total,prop)
         #cv2.imshow("stop",mask)
-        font                   = cv2.FONT_HERSHEY_SIMPLEX
-        bottomLeftCornerOfText = (250,50)
-        fontScale              = 0.7
-        fontColor              = (255,255,255)
-        lineType               = 2
-        cv2.putText(mask,'{0:3f}'.format(prop), 
-        bottomLeftCornerOfText, 
-        font, 
-        fontScale,
-        fontColor,
-        lineType)
+        a = self.model.predict(numpy.array([mask[350:,50:600]/255.0]))
+        print(a)
         cv2.imshow("window", mask)
-        if(prop <= 0.03 and prop >= 0.02):
-            print(prop)
-            self.pub.publish("yes")
+        if(a[0][0] <= a[0][1]):
+            print("Found intersection")
+            #self.pub.publish("yes")
             time.sleep(3)
-            self.pub.publish("no")
-            time.sleep(10)
+            #self.pub.publish("no")
+            #time.sleep(20)
         else:
             self.pub.publish("no")
-
-        
-        cv2.imshow("window", mask)
+        #cv2.imshow("window", mask)
         cv2.waitKey(3)
 
 
