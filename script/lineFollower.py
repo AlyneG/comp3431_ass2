@@ -15,10 +15,12 @@ class Follower:
     #cv2.namedWindow("window", 1)
     self.numImage = 0
     self.image_sub = rospy.Subscriber('camera/image', Image, self.image_callback)
-    self.inter_sub = rospy.Subscriber('intersection', String, self.inter_callback)                    
+    self.inter_sub = rospy.Subscriber('intersection', String, self.inter_callback)    
+    self.stop_sub = rospy.Subscriber('stop', String, self.stop_callback)                                    
     self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
     self.twist = Twist()
-    self.move = True
+    self.inter = False
+    self.stop = False
     self.countnointer = 0
     self.countinter = 0
 
@@ -59,8 +61,9 @@ class Follower:
 
     #print(M)
     ru = 1
-    if not self.move:
+    if(self.inter or self.stop):
       ru = 0
+    print(self.stop)
     if M['m00'] > 0:
       cx = int(M['m10']/M['m00'])
       cy = int(M['m01']/M['m00'])
@@ -77,11 +80,14 @@ class Follower:
       os.chdir("/home/rsa/image/intersection/notInter")
       cv2.imwrite(str(self.countinter)+".jpg", mask)
       self.countinter+=1'''
-    cv2.imshow("mask",mask)
+    cv2.imshow("mask",image)
     cv2.waitKey(3)
 
   def inter_callback(self,data):
-    self.move = data.data=='no'
+    self.inter = data.data =='yes'
+
+  def stop_callback(self,data):
+    self.stop = data.data =='yes'
 
 rospy.init_node('follower')
 follower = Follower()

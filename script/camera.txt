@@ -4,9 +4,9 @@ export GAZEBO_MODE=false
 export AUTO_EX_CALIB=action
 
 GAZEBO
-export AUTO_IN_CALIB=calibration
+export AUTO_IN_CALIB=action
 export GAZEBO_MODE=true
-export AUTO_EX_CALIB=calibration
+export AUTO_EX_CALIB=action
 roslaunch comp3431_ass2 runGazebo.launch
 
 

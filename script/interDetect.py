@@ -11,7 +11,7 @@ class Intersection:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('camera/image', Image, self.intersection_detect)
-        self.pub = rospy.Publisher('intersection',String,queue_size=10)
+        self.pub = rospy.Publisher('intersection',String,queue_size=1)
         self.stop = None
     def intersection_detect(self, image):
         if(self.stop != None and datetime.now() < self.stop-timedelta(seconds=10)):
@@ -63,7 +63,7 @@ class Intersection:
         fontColor,
         lineType)
         if(prop >= 0.04 and prop <= 0.06):
-            print(prop)
+            print("intersection detect")
             self.stop = datetime.now()+timedelta(seconds=13)
             self.pub.publish("yes")
         else:
