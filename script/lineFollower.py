@@ -47,7 +47,8 @@ class Follower:
     h, w, d = image.shape
     search_top = int(8.5*h/10)
     search_bot = int(h) 
-    it = 30
+    it = 19
+    #cv2.imshow("mask",mask)
     dilate = cv2.dilate(mask,None, iterations=it)
     mask = cv2.erode(dilate,None, iterations=it)
     mask = 255 - mask
@@ -76,6 +77,7 @@ class Follower:
       os.chdir("/home/rsa/image/intersection/notInter")
       cv2.imwrite(str(self.countinter)+".jpg", mask)
       self.countinter+=1'''
+    cv2.imshow("mask",mask)
     cv2.waitKey(3)
 
   def inter_callback(self,data):

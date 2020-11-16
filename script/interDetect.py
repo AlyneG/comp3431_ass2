@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import rospy, cv2, cv_bridge, numpy
+from datetime import datetime, timedelta
 from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
@@ -11,7 +12,19 @@ class Intersection:
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('camera/image', Image, self.intersection_detect)
         self.pub = rospy.Publisher('intersection',String,queue_size=10)
+        self.stop = None
     def intersection_detect(self, image):
+        if(self.stop != None and datetime.now() < self.stop-timedelta(seconds=10)):
+            return
+        elif(self.stop != None and datetime.now() >= self.stop-timedelta(seconds=10) and datetime.now()<self.stop):
+            self.pub.publish("no")
+            return
+        else:
+            self.stop = None
+            self.pub.publish("no")
+
+
+            
         image = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         #change perspective
         rows, cols = image.shape[:2]
@@ -30,7 +43,7 @@ class Intersection:
         h, w, d = image.shape
         search_top = int(8.5*h/10)
         search_bot = int(h) 
-        it = 40
+        it = 10
         dilate = cv2.dilate(mask,None, iterations=it)
         mask = cv2.erode(dilate,None, iterations=it)
         mask = 255 - mask
@@ -42,28 +55,25 @@ class Intersection:
         #print(number,total,prop)
         #cv2.imshow("stop",mask)
         font                   = cv2.FONT_HERSHEY_SIMPLEX
-        bottomLeftCornerOfText = (250,50)
-        fontScale              = 0.7
+        bottomLeftCornerOfText = (100,25)
+        fontScale              = 0.5
         fontColor              = (255,255,255)
         lineType               = 2
-        cv2.putText(mask,'{0:3f}'.format(prop), 
+        cv2.putText(mask,'{0:2f}'.format(prop), 
         bottomLeftCornerOfText, 
         font, 
         fontScale,
         fontColor,
         lineType)
-        cv2.imshow("window", mask)
-        if(prop <= 0.03 and prop >= 0.02):
+        if(prop >= 0.04 and prop <= 0.06):
             print(prop)
+            self.stop = datetime.now()+timedelta(seconds=13)
             self.pub.publish("yes")
-            time.sleep(3)
-            self.pub.publish("no")
-            time.sleep(10)
         else:
             self.pub.publish("no")
 
         
-        cv2.imshow("window", mask)
+        #cv2.imshow("window", mask)
         cv2.waitKey(3)
 
 
