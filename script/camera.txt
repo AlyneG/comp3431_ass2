@@ -1,10 +1,14 @@
 REAL
 export AUTO_IN_CALIB=action
 export GAZEBO_MODE=false
-export AUTO_EX_CALIB=calibration
+export AUTO_EX_CALIB=action
 
 GAZEBO
-export AUTO_IN_CALIB=action
+export AUTO_IN_CALIB=calibration
 export GAZEBO_MODE=true
 export AUTO_EX_CALIB=calibration
-roslaunch comp3431_ass2 runGazebo.launchs
+roslaunch comp3431_ass2 runGazebo.launch
+
+
+roslaunch turtlebot3_bringup turtlebot3_robot.launch
+roslaunch turtlebot3_autorace_camera turtlebot3_autorace_camera_pi.launch 

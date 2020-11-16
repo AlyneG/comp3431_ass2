@@ -30,8 +30,6 @@ class Intersection:
         rows, cols = image.shape[:2]
         rows-=1
         cols-=1
-
-        #src_points = numpy.float32([[int(cols*1.5/4),int(rows*4/7)],[int(cols*2.5/4), int(rows*4/7)],[0,rows], [cols,rows]])
         src_points = numpy.float32([[0,0],[cols, 0],[0,rows], [cols,rows]])
         dst_points = numpy.float32([[0,10],[cols,10], [int(cols*1/7),rows], [int((cols)*6/7),rows]])
         affine_matrix = cv2.getPerspectiveTransform(src_points, dst_points)
@@ -53,7 +51,6 @@ class Intersection:
         total = h*w*1.0
         prop = number/total
         #print(number,total,prop)
-        #cv2.imshow("stop",mask)
         font                   = cv2.FONT_HERSHEY_SIMPLEX
         bottomLeftCornerOfText = (100,25)
         fontScale              = 0.5
