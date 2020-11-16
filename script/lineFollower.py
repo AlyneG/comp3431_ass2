@@ -31,18 +31,11 @@ class Follower:
     rows-=1
     cols-=1
 
-    #src_points = numpy.float32([[int(cols*1.5/4),int(rows*4/7)],[int(cols*2.5/4), int(rows*4/7)],[0,rows], [cols,rows]])
     src_points = numpy.float32([[0,0],[cols, 0],[0,rows], [cols,rows]])
     dst_points = numpy.float32([[0,10],[cols,10], [int(cols*1/7),rows], [int((cols)*6/7),rows]])
     affine_matrix = cv2.getPerspectiveTransform(src_points, dst_points)
     image = cv2.warpPerspective(image, affine_matrix, (cols+1,rows+1))
     image[image==0] = 255
-    '''
-    cv2.circle(image, (0, rows), 5, (0,0,255), -1)
-    cv2.circle(image, (cols, rows), 5, (0,0,255), -1)
-    cv2.circle(image, (int(cols*1.3/4), int(rows*4/7)), 5, (0,0,255), -1)
-    cv2.circle(image, (int(cols*2.7/4), int(rows*4/7)), 5, (0,0,255), -1)
-    '''
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _,mask = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)
@@ -50,7 +43,7 @@ class Follower:
     search_top = int(8.5*h/10)
     search_bot = int(h) 
     it = 19
-    #cv2.imshow("mask",mask)
+
     dilate = cv2.dilate(mask,None, iterations=it)
     mask = cv2.erode(dilate,None, iterations=it)
     mask = 255 - mask
@@ -63,7 +56,7 @@ class Follower:
     ru = 1
     if(self.inter or self.stop):
       ru = 0
-    print(self.stop)
+
     if M['m00'] > 0:
       cx = int(M['m10']/M['m00'])
       cy = int(M['m01']/M['m00'])
@@ -72,14 +65,7 @@ class Follower:
       self.twist.linear.x = 0.1 * ru
       self.twist.angular.z = -float(err) / 40 * ru
       self.cmd_vel_pub.publish(self.twist)
-    '''if(ru == 1):
-      os.chdir("/home/rsa/image/intersection/isInter")
-      cv2.imwrite(str(self.countnointer)+".jpg", mask)
-      self.countnointer += 1
-    else:
-      os.chdir("/home/rsa/image/intersection/notInter")
-      cv2.imwrite(str(self.countinter)+".jpg", mask)
-      self.countinter+=1'''
+      
     cv2.imshow("mask",image)
     cv2.waitKey(3)
 
