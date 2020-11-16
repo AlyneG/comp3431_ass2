@@ -16,11 +16,13 @@ class Follower:
     self.numImage = 0
     self.image_sub = rospy.Subscriber('camera/image', Image, self.image_callback)
     self.inter_sub = rospy.Subscriber('intersection', String, self.inter_callback)    
-    self.stop_sub = rospy.Subscriber('stop', String, self.stop_callback)                                    
+    self.stop_sub = rospy.Subscriber('stop', String, self.stop_callback)
+    self.turn_sub = rospy.Subscriber('turb', String, self.turn_callback)                                    
     self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
     self.twist = Twist()
     self.inter = False
     self.stop = False
+    self.turn = False
     self.countnointer = 0
     self.countinter = 0
 
@@ -54,7 +56,7 @@ class Follower:
 
     #print(M)
     ru = 1
-    if(self.inter or self.stop):
+    if((self.inter and self.stop) or self.turn):
       ru = 0
 
     if M['m00'] > 0:
@@ -65,7 +67,7 @@ class Follower:
       self.twist.linear.x = 0.1 * ru
       self.twist.angular.z = -float(err) / 40 * ru
       self.cmd_vel_pub.publish(self.twist)
-      
+
     cv2.imshow("mask",image)
     cv2.waitKey(3)
 
@@ -73,6 +75,8 @@ class Follower:
     self.inter = data.data =='yes'
 
   def stop_callback(self,data):
+    self.stop = data.data =='yes'
+  def turn_callback(self,data):
     self.stop = data.data =='yes'
 
 rospy.init_node('follower')
