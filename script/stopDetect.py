@@ -41,8 +41,6 @@ class Stop:
         else:
             self.pub.publish("no")
 
-
-
         cv2.imshow("window", thresh)
         cv2.waitKey(3)
 rospy.init_node('stop')

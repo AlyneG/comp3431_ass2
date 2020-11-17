@@ -22,13 +22,12 @@ class Follower:
     self.twist = Twist()
     self.inter = False
     self.stop = False
-    self.turn = False
+    self.turn = None
     self.countnointer = 0
     self.countinter = 0
 
   def image_callback(self, msg):
-    if(self.turn):
-      return
+
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
     #change perspective
     rows, cols = image.shape[:2]
@@ -57,8 +56,14 @@ class Follower:
     image[:,:,]
 
     #print(M)
+    cv2.imshow("mask",image)
+    if(self.turn):
+      print("turn signal")
+      self.sendMessage(self.turn)
+      return
+
     ru = 1
-    if(self.inter or self.stop or self.turn):
+    if(self.inter or self.stop):
       ru = 0
 
     if M['m00'] > 0:
@@ -70,8 +75,32 @@ class Follower:
       self.twist.angular.z = -float(err) / 40 * ru
       self.cmd_vel_pub.publish(self.twist)
 
-    cv2.imshow("mask",image)
     cv2.waitKey(3)
+
+  
+  def sendMessage(self,left):
+    twist = Twist()
+    twist.linear.y = 0
+    twist.linear.x = 0.1
+    twist.linear.z = 0
+    twist.angular.x = 0
+    twist.angular.y = 0
+    if(left):
+        twist.angular.z = 0.5
+    else:
+        twist.angular.z = -0.5
+    self.cmd_vel_pub.publish(twist)
+
+  def stop_turn(self):
+    twist = Twist()
+    twist.linear.y = 0
+    twist.linear.x = 0
+    twist.linear.z = 0
+    twist.angular.x = 0
+    twist.angular.y = 0
+    twist.angular.z = 0
+    self.cmd_vel_pub.publish(twist)
+
 
   def inter_callback(self,data):
     self.inter = data.data =='yes'
@@ -79,8 +108,12 @@ class Follower:
   def stop_callback(self,data):
     self.stop = data.data =='yes'
   def turn_callback(self,data):
-    self.stop = data.data =='yes'
-
+    if(data.data == "left"):
+      self.turn = True
+    elif(data.data == "right"):
+      self.turn = False
+    else:
+      self.turn = None
 rospy.init_node('follower')
 follower = Follower()
 rospy.spin()

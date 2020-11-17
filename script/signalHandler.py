@@ -19,15 +19,23 @@ class Signal:
         self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.twist = Twist()
         self.stop = None
-
+        self.turnEndTime = None
 
         self.max_pink = 0
         self.pink_x = None
         self.pink_y = None
         self.max_yellow = 0
         self.yellow_x = None
+
         self.yellow_y = None
+
+        self.seen = None
     def signal(self,image):
+        if(self.seen != None and datetime.now() < self.seen):
+            return
+        elif(self.seen != None and datetime.now() >= self.seen):
+            self.pub.publish("no")
+            return
         image = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 
@@ -39,8 +47,8 @@ class Signal:
 
         # Set range for yellow color and
         # define mask
-        yellow_lower = np.array([20, 150, 150], np.uint8)
-        yellow_upper = np.array([30, 255, 255], np.uint8)
+        yellow_lower = np.array([20, 150, 100], np.uint8)
+        yellow_upper = np.array([40, 255, 255], np.uint8)
         yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
 
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
@@ -98,47 +106,18 @@ class Signal:
                     self.yellow_x = x
                     self.yellow_y = y
                     self.max_yellow = area
-
+        left = None
         if(self.max_pink > 0 and self.max_yellow > 0):
             if(self.yellow_y > self.pink_y):
-                print("Pink is on top")
+                #print("Turn left")
+                self.pub.publish("left")
             else:
-                print("Yellow is on top")
-                
-        cv2.imshow('color',image)
-        cv2.waitKey(3)
-
-    def start_turn(self):
-        now = datetime.now()
-        stop = now + timedelta(seconds=1.5)
-        while datetime.now()<stop:
-            signal.turn(False)
-            self.pub.publish("yes")
-        signal.stop_turn()
-        self.pub.publish("no")
-
-
-    def turn(self,left):
-        twist = Twist()
-        twist.linear.y = 0
-        twist.linear.x = 0.1
-        twist.linear.z = 0
-        twist.angular.x = 0
-        twist.angular.y = 0
-        if(left):
-            twist.angular.z = 0.5
+                #print("Turn right")
+                self.pub.publish("right")
         else:
-            twist.angular.z = -0.5
-        self.cmd_vel_pub.publish(twist)
-    def stop_turn(self):
-        twist = Twist()
-        twist.linear.y = 0
-        twist.linear.x = 0
-        twist.linear.z = 0
-        twist.angular.x = 0
-        twist.angular.y = 0
-        twist.angular.z = 0
-        self.cmd_vel_pub.publish(twist)
+            self.pub.publish("Non")
+        #cv2.imshow('color',image)
+        cv2.waitKey(3)
 
 if __name__=='__main__':
     rospy.init_node('turn', anonymous=True)
