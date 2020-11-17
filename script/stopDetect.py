@@ -34,9 +34,7 @@ class Stop:
             area = rect[2] * rect[3]
             max_area = max(area,max_area)
         proportion = max_area/(h*w*1.0)
-        #print(proportion)
-        #cv2.imshow("red",thresh)
-        #print(proportion)
+    
         if(proportion >= 0.02):
             print("stop sign detect")
             self.pub.publish("yes")
