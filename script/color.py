@@ -37,6 +37,7 @@ class colorDetection:
 
     def color_callback(self, msg):
 
+<<<<<<< HEAD
         image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         #image = cv2.imread('MicrosoftTeams-image.png',desired_encoding='bgr8')
         #h, w, d = image.shape
@@ -297,6 +298,9 @@ class colorDetection:
 
         cv2.imshow('color',image)
         cv2.waitKey(3)
+=======
+        
+>>>>>>> c6212c2c1f9e13a7661642f34cb36289203e125a
 
 
 

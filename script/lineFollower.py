@@ -17,7 +17,7 @@ class Follower:
     self.image_sub = rospy.Subscriber('camera/image', Image, self.image_callback)
     self.inter_sub = rospy.Subscriber('intersection', String, self.inter_callback)    
     self.stop_sub = rospy.Subscriber('stop', String, self.stop_callback)
-    self.turn_sub = rospy.Subscriber('turb', String, self.turn_callback)                                    
+    self.turn_sub = rospy.Subscriber('turn', String, self.turn_callback)                                    
     self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
     self.twist = Twist()
     self.inter = False
@@ -27,6 +27,8 @@ class Follower:
     self.countinter = 0
 
   def image_callback(self, msg):
+    if(self.turn):
+      return
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
     #change perspective
     rows, cols = image.shape[:2]
@@ -56,7 +58,7 @@ class Follower:
 
     #print(M)
     ru = 1
-    if((self.inter and self.stop) or self.turn):
+    if(self.inter or self.stop or self.turn):
       ru = 0
 
     if M['m00'] > 0:
