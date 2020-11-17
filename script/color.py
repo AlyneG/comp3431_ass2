@@ -16,10 +16,10 @@ class colorDetection:
         self.max_vel_pub = rospy.Publisher('control/max_vel', Float64, queue_size=1)
         self.stop_pub = rospy.Publisher('control/stop', Bool, queue_size=1)
 
-        self.pink_detected = False
-        self.green_detected = False
-        self.blue_detected = False
-        self.yellow_detected = False
+        # self.pink_detected = False
+        # self.green_detected = False
+        # self.blue_detected = False
+        # self.yellow_detected = False
 
         self.max_pink = 0
         self.pink_x = None
@@ -38,26 +38,29 @@ class colorDetection:
 
         #image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         image = cv2.imread('MicrosoftTeams-image.png',desired_encoding='bgr8')
+        #h, w, d = image.shape
+        #search_top = int(h/10)
 
         hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 
         # Set range for pink color and
         # define mask
-        pink_lower = np.array([140, 100, 150], np.uint8)
-        pink_upper = np.array([170, 255, 255], np.uint8)
+        pink_lower = np.array([135, 70, 150], np.uint8)
+        pink_upper = np.array([180, 255, 255], np.uint8)
         pink_mask = cv2.inRange(hsv, pink_lower, pink_upper)
 
         # Set range for green color and
         # define mask
-        green_lower = np.array([35, 100, 50], np.uint8)
-        green_upper = np.array([90, 255, 255], np.uint8)
+        green_lower = np.array([40, 70, 50], np.uint8)
+        green_upper = np.array([80, 255, 255], np.uint8)
         green_mask = cv2.inRange(hsv, green_lower, green_upper)
 
         # Set range for blue color and
         # define mask
-        blue_lower = np.array([90, 100, 100], np.uint8)
-        blue_upper = np.array([110, 255, 255], np.uint8)
+        blue_lower = np.array([90, 100, 50], np.uint8)
+        blue_upper = np.array([120, 255, 255], np.uint8)
         blue_mask = cv2.inRange(hsv, blue_lower, blue_upper)
+        #blue_mask[0:search_top, 0:w] = 0 #stops it from detecting the blue from the window
 
         # Set range for yellow color and
         # define mask
@@ -109,8 +112,8 @@ class colorDetection:
                             cv2.FONT_HERSHEY_SIMPLEX, 1.0,
                             (229, 92, 190))
 
-                print('Pick Color Detected')
-                self.pink_detected = True
+                # print('Pick Color Detected')
+                # self.pink_detected = True
                 #finds the largest area of colour
                 #theoretically, this should be the closest to the robot
                 if(area > max_pink):
@@ -135,8 +138,8 @@ class colorDetection:
                             cv2.FONT_HERSHEY_SIMPLEX,
                             1.0, (0, 255, 0))
 
-                print('Green Color Detected')
-                self.green_detected = True
+                # print('Green Color Detected')
+                # self.green_detected = True
                 if(area > max_green):
                     self.green_x = x
                     self.green_y = y
@@ -159,9 +162,9 @@ class colorDetection:
                 cv2.putText(image, "Blue Colour", (x, y),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             1.0, (0, 0, 255))
-
-                print('Blue Color Detected')
-                self.blue_detected = True
+                #
+                # print('Blue Color Detected')
+                # self.blue_detected = True
                 if(area > max_blue):
                     self.blue_x = x
                     self.blue_y = y
@@ -184,8 +187,8 @@ class colorDetection:
                             cv2.FONT_HERSHEY_SIMPLEX,
                             1.0, (255, 254, 50))
 
-                print('Yellow Color Detected')
-                self.yellow_detected = True
+                # print('Yellow Color Detected')
+                # self.yellow_detected = True
                 if(area > max_yellow):
                     self.yellow_x = x
                     self.yellow_y = y
@@ -224,34 +227,54 @@ class colorDetection:
             if(self.max_green > self.max_blue):
                 if(self.max_green > self.max_yellow):
                     #green has the largest area
+                    #look at position of green relative to pink
                     print("green has the largest area")
                     print(self.green_x)
                     print(self.green_y)
                     print(self.pink_x)
                     print(self.pink_y)
+                    if(self.green_y > self.pink_y):
+                        print("Pink is on top")
+                    else:
+                        print("Green is on top")
                     #if(self.pink_x > )
                 elif(self.max_yellow >= self.max_green):
                     #yellow has the largest area
+                    #look at position of yellow relative to pink
                     print("yellow has the largest area")
                     print(self.yellow_x)
                     print(self.yellow_y)
                     print(self.pink_x)
                     print(self.pink_y)
+                    if(self.yellow_y > self.pink_y):
+                        print("Pink is on top")
+                    else:
+                        print("Yellow is on top")
             else:
                 if(self.max_blue > self.max_yellow):
                     #blue has the largest area
+                    #look at position of blue relative to pink
                     print("blue has the largest area")
                     print(self.blue_x)
                     print(self.blue_y)
                     print(self.pink_x)
                     print(self.pink_y)
+                    if(self.blue_y > self.pink_y):
+                        print("Pink is on top")
+                    else:
+                        print("Blue is on top")
                 elif(self.max_yellow >= self.max_green):
                     #yellow has the largest area
+                    #look at position of yellow relative to pink
                     print("yellow has the largest area")
                     print(self.yellow_x)
                     print(self.yellow_y)
                     print(self.pink_x)
                     print(self.pink_y)
+                    if(self.yellow_y > self.pink_y):
+                        print("Pink is on top")
+                    else:
+                        print("Yellow is on top")
         # Program Termination
         #plt.imsave('color.jpg', image)
         cv2.imshow('color',image)
