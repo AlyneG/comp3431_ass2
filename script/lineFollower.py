@@ -56,7 +56,7 @@ class Follower:
 
     #print(M)
     ru = 1
-    if((self.inter and self.stop) or self.turn):
+    if(self.inter or self.stop or self.turn):
       ru = 0
 
     if M['m00'] > 0:
