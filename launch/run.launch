@@ -8,6 +8,7 @@
     <include file="$(find turtlebot3_autorace_camera )/launch/turtlebot3_autorace_extrinsic_camera_calibration.launch"/>
 
     <node pkg="comp3431_ass2" type="lineFollower.py" name="lineFollower" output="screen"/>
-    <!--node pkg="comp3431_ass2" type="interDetect.py" name="interDetect" output="screen"/-->
+    <node pkg="comp3431_ass2" type="interDetect.py" name="interDetect" output="screen"/>
+    <node pkg="comp3431_ass2" type="signalHandler.py" name="signalHandler" output="screen"/>
     <node pkg="comp3431_ass2" type="stopDetect.py" name="stopDetect" output="screen"/>
 </launch>

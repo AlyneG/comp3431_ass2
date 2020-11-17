@@ -36,14 +36,14 @@ class Stop:
             max_area = max(area,max_area)
         proportion = max_area/(h*w*1.0)
     
-        if(proportion >= 0.02):
+        if(proportion >= 0.1):
             print("stop sign detect")
             self.pub.publish("yes")
         else:
             self.pub.publish("no")
 
 
-        cv2.imshow("window", thresh)
+        #cv2.imshow("window", thresh)
         cv2.waitKey(3)
 rospy.init_node('stop')
 stop = Stop()

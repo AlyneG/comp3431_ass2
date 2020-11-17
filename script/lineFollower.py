@@ -48,15 +48,13 @@ class Follower:
     it = 19
 
     dilate = cv2.dilate(mask,None, iterations=it)
-    mask = cv2.erode(dilate,None, iterations=it)
+    mask = cv2.erode(dilate,None, iterations=it-3)
     mask = 255 - mask
     mask[search_bot:h, 0:w] = 0
     mask[0:search_top, 0:w] = 0
     M = cv2.moments(mask)
-    image[:,:,]
-
     #print(M)
-    cv2.imshow("mask",image)
+    cv2.imshow("mask",mask)
     if(self.turn):
       print("turn signal")
       self.sendMessage(self.turn)
@@ -65,6 +63,7 @@ class Follower:
     ru = 1
     if(self.inter or self.stop):
       ru = 0
+    #print("send message",ru)
 
     if M['m00'] > 0:
       cx = int(M['m10']/M['m00'])
