@@ -16,8 +16,9 @@ class Stop:
     def stop_detect(self, image):            
         img = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        mask_red = cv2.inRange(hsv, (170, 70, 50), (180, 255, 255))
-    
+        cv2.imshow("s",img)
+        mask_red = cv2.inRange(hsv, (175, 70, 50), (200, 255, 255))
+        #mask_red = cv2.inRange(img,(40,30,120),(100,50,160))
         h,w,_ = img.shape
 
         imask_red = mask_red>0
@@ -40,6 +41,7 @@ class Stop:
             self.pub.publish("yes")
         else:
             self.pub.publish("no")
+
 
         cv2.imshow("window", thresh)
         cv2.waitKey(3)
