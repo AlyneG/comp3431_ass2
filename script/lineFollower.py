@@ -17,9 +17,11 @@ class Follower:
     self.image_sub = rospy.Subscriber('camera/image', Image, self.image_callback)
     self.inter_sub = rospy.Subscriber('intersection', String, self.inter_callback)    
     self.stop_sub = rospy.Subscriber('stop', String, self.stop_callback)
-    self.turn_sub = rospy.Subscriber('turn', String, self.turn_callback)                                    
+    self.turn_sub = rospy.Subscriber('turn', String, self.turn_callback)      
+    self.obstruct_sub = rospy.Subscriber('obstruct', String, self.obstruct_callback)
     self.inter = False
     self.stop = False
+    self.obstruct = False
     self.turn = None
     self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
     self.twist = Twist()
@@ -52,7 +54,7 @@ class Follower:
     mask[0:search_top, 0:w] = 0
     M = cv2.moments(mask)
 
-    cv2.imshow("mask",mask)
+    cv2.imshow("mask",image)
     #if a turn signal is detected, turn left or right
     if(self.turn):
       print("turn signal")
@@ -60,7 +62,7 @@ class Follower:
       return
     #if a intersection of stop sing is detect, stop
     ru = 1
-    if(self.inter or self.stop):
+    if(self.inter or self.stop or self.obstruct):
       ru = 0
     #print("send message",ru)
 
@@ -112,6 +114,9 @@ class Follower:
       self.turn = False
     else:
       self.turn = None
+
+  def obstruct_callback(self,data):
+    self.obstruct = data.data == "yes"
 
 rospy.init_node('follower')
 follower = Follower()

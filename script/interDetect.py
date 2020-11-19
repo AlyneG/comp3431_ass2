@@ -62,7 +62,7 @@ class Intersection:
         fontScale,
         fontColor,
         lineType)
-        if(prop >= 0.04 and prop <= 0.06):
+        if(prop >= 0.04 and prop <= 0.05):
             print("intersection detect")
             self.stop = datetime.now()+timedelta(seconds=13)
             self.pub.publish("yes")

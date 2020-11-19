@@ -11,4 +11,5 @@
     <node pkg="comp3431_ass2" type="interDetect.py" name="interDetect" output="screen"/>
     <node pkg="comp3431_ass2" type="signalHandler.py" name="signalHandler" output="screen"/>
     <node pkg="comp3431_ass2" type="stopDetect.py" name="stopDetect" output="screen"/>
+    <node pkg="comp3431_ass2" type="robotDetect.py" name="robotDetect" output="screen"/>
 </launch>

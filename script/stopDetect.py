@@ -16,7 +16,6 @@ class Stop:
     def stop_detect(self, image):            
         img = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        cv2.imshow("s",img)
         mask_red = cv2.inRange(hsv, (175, 70, 50), (200, 255, 255))
         #mask_red = cv2.inRange(img,(40,30,120),(100,50,160))
         h,w,_ = img.shape
