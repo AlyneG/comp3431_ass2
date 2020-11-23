@@ -17,6 +17,10 @@ class Intersection:
         image = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         #change perspective
         rows, cols = image.shape[:2]
+        if(rows != 240 or cols != 320):
+            image = cv2.resize(image,(320,240))
+            rows = 240
+            cols = 320
         rows-=1
         cols-=1
         src_points = numpy.float32([[0,0],[cols, 0],[0,rows], [cols,rows]])

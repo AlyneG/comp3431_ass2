@@ -31,6 +31,10 @@ class Follower:
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
     #change perspective
     rows, cols = image.shape[:2]
+    if(rows != 240 or cols != 320):
+      image = cv2.resize(image,(320,240))
+      rows = 240
+      cols = 320
     rows-=1
     cols-=1
 
@@ -43,6 +47,7 @@ class Follower:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _,mask = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)
     h, w, d = image.shape
+
     search_top = int(8.5*h/10)
     search_bot = int(h)
     #dilate and erode to make the line be more clear
@@ -55,7 +60,7 @@ class Follower:
     mask[0:search_top, 0:w] = 0
     M = cv2.moments(mask)
 
-    cv2.imshow("linfollower",mask)
+    #cv2.imshow("linfollower",image)
     #if a turn signal is detected, turn left or right
     if(self.turn):
       print("turn signal")
@@ -66,7 +71,7 @@ class Follower:
     if(self.inter or self.stop or self.obstruct):
       ru = 0
     #print("send message",ru)
-
+  
     if M['m00'] > 0:
       cx = int(M['m10']/M['m00'])
       cy = int(M['m01']/M['m00'])
@@ -75,7 +80,7 @@ class Follower:
       self.twist.linear.x = 0.1 * ru
       self.twist.angular.z = -float(err) / 40 * ru
       self.cmd_vel_pub.publish(self.twist)
-
+    cv2.imshow("linfollower",mask)
     cv2.waitKey(3)
 
   def sendMessage(self,left):
