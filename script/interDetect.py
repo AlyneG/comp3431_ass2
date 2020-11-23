@@ -14,17 +14,6 @@ class Intersection:
         self.pub = rospy.Publisher('intersection',String,queue_size=1)
         self.stop = None
     def intersection_detect(self, image):
-        if(self.stop != None and datetime.now() < self.stop-timedelta(seconds=10)):
-            return
-        elif(self.stop != None and datetime.now() >= self.stop-timedelta(seconds=10) and datetime.now()<self.stop):
-            self.pub.publish("no")
-            return
-        else:
-            self.stop = None
-            self.pub.publish("no")
-
-
-            
         image = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         #change perspective
         rows, cols = image.shape[:2]
@@ -62,16 +51,25 @@ class Intersection:
         fontScale,
         fontColor,
         lineType)
-        if(prop >= 0.05 and prop <= 0.06):
+        if(self.stop != None and datetime.now() < self.stop-timedelta(seconds=10)):
+            return
+        elif(self.stop != None and datetime.now() >= self.stop-timedelta(seconds=10) and datetime.now()<self.stop):
+            self.pub.publish("no")
+            return
+        else:
+            self.stop = None
+            self.pub.publish("no")
+
+        if(prop >= 0.01 and prop <= 0.045):
             print("intersection detect")
             self.stop = datetime.now()+timedelta(seconds=13)
             self.pub.publish("yes")
         else:
             self.pub.publish("no")
 
-        
-        #cv2.imshow("window", mask)
+        #cv2.imshow("inter", mask)
         cv2.waitKey(3)
+        
 
 
 rospy.init_node('intersection')

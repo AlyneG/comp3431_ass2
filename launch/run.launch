@@ -5,7 +5,7 @@
     <!--Connect to autorace intrinsic camera-->
     <include file="$(find turtlebot3_autorace_camera )/launch/turtlebot3_autorace_intrinsic_camera_calibration.launch"/>
     <!--Connect to autorace entrinsic camera-->
-    <!--include file="$(find turtlebot3_autorace_camera )/launch/turtlebot3_autorace_extrinsic_camera_calibration.launch"/-->
+    <include file="$(find turtlebot3_autorace_camera )/launch/turtlebot3_autorace_extrinsic_camera_calibration.launch"/>
 
     <node pkg="comp3431_ass2" type="lineFollower.py" name="lineFollower" output="screen"/>
     <node pkg="comp3431_ass2" type="interDetect.py" name="interDetect" output="screen"/>

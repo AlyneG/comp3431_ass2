@@ -46,15 +46,16 @@ class Follower:
     search_top = int(8.5*h/10)
     search_bot = int(h)
     #dilate and erode to make the line be more clear
-    it = 20
+    it = 19
     dilate = cv2.dilate(mask,None, iterations=it)
     mask = cv2.erode(dilate,None, iterations=it)
     mask = 255 - mask
     mask[search_bot:h, 0:w] = 0
+    #mask[search_top:search_bot,int(1.2*w/3):int(1.8*w/3)] = 0
     mask[0:search_top, 0:w] = 0
     M = cv2.moments(mask)
 
-    cv2.imshow("mask",image)
+    cv2.imshow("linfollower",mask)
     #if a turn signal is detected, turn left or right
     if(self.turn):
       print("turn signal")
@@ -80,14 +81,14 @@ class Follower:
   def sendMessage(self,left):
     twist = Twist()
     twist.linear.y = 0
-    twist.linear.x = 0.1
+    twist.linear.x = 0.3
     twist.linear.z = 0
     twist.angular.x = 0
     twist.angular.y = 0
     if(left):
-        twist.angular.z = 0.5
+        twist.angular.z = 1
     else:
-        twist.angular.z = -0.5
+        twist.angular.z = -1
     self.cmd_vel_pub.publish(twist)
 
   def stop_turn(self):
