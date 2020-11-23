@@ -46,9 +46,9 @@ class Follower:
     search_top = int(8.5*h/10)
     search_bot = int(h)
     #dilate and erode to make the line be more clear
-    it = 19
+    it = 20
     dilate = cv2.dilate(mask,None, iterations=it)
-    mask = cv2.erode(dilate,None, iterations=it-3)
+    mask = cv2.erode(dilate,None, iterations=it)
     mask = 255 - mask
     mask[search_bot:h, 0:w] = 0
     mask[0:search_top, 0:w] = 0

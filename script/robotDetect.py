@@ -18,10 +18,14 @@ class Fliter:
             data.ranges[i] = 0
 
         # the closest object
-        self.data = min([i for i in data.ranges if i != 0])
+        lis = [i for i in data.ranges if i != 0]
+        if(lis != []):
+            self.data = min(lis)
+        else:
+            self.data = None
         
         forward = True
-        if forward and self.data < 0.5:
+        if forward and not self.data is None and self.data < 0.3:
             print("Obstruct detected")
             self.pub.publish("yes")
         else:

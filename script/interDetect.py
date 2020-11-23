@@ -41,7 +41,7 @@ class Intersection:
         h, w, d = image.shape
         search_top = int(8.5*h/10)
         search_bot = int(h) 
-        it = 10
+        it = 20
         dilate = cv2.dilate(mask,None, iterations=it)
         mask = cv2.erode(dilate,None, iterations=it)
         mask = 255 - mask
@@ -62,7 +62,7 @@ class Intersection:
         fontScale,
         fontColor,
         lineType)
-        if(prop >= 0.04 and prop <= 0.05):
+        if(prop >= 0.05 and prop <= 0.06):
             print("intersection detect")
             self.stop = datetime.now()+timedelta(seconds=13)
             self.pub.publish("yes")
