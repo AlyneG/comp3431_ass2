@@ -58,12 +58,13 @@ class Intersection:
         if(self.stop != None and datetime.now() < self.stop-timedelta(seconds=10)):
             return
         elif(self.stop != None and datetime.now() >= self.stop-timedelta(seconds=10) and datetime.now()<self.stop):
+            #print("start moving")
             self.pub.publish("no")
             return
         else:
             self.stop = None
+            #print("end turn")
             self.pub.publish("no")
-
         if(prop >= 0.01 and prop <= 0.045):
             print("intersection detect")
             self.stop = datetime.now()+timedelta(seconds=13)

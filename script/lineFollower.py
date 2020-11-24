@@ -62,8 +62,7 @@ class Follower:
 
     #cv2.imshow("linfollower",image)
     #if a turn signal is detected, turn left or right
-    if(self.turn):
-      print("turn signal")
+    if(self.turn is not None):
       self.sendMessage(self.turn)
       return
     #if a intersection of stop sing is detect, stop
@@ -80,21 +79,31 @@ class Follower:
       self.twist.linear.x = 0.1 * ru
       self.twist.angular.z = -float(err) / 40 * ru
       self.cmd_vel_pub.publish(self.twist)
-    cv2.imshow("linfollower",mask)
+    elif M['m00'] == 0:
+      self.twist.linear.x = 0.1 * ru
+      self.twist.angular.z = 0
+      self.cmd_vel_pub.publish(self.twist)
+    cv2.imshow("linefollower",mask)
     cv2.waitKey(3)
 
   def sendMessage(self,left):
     twist = Twist()
     twist.linear.y = 0
-    twist.linear.x = 0.3
+    twist.linear.x = 0.1
     twist.linear.z = 0
     twist.angular.x = 0
     twist.angular.y = 0
-    if(left):
-        twist.angular.z = 1
-    else:
-        twist.angular.z = -1
     self.cmd_vel_pub.publish(twist)
+    rospy.sleep(3)
+    twist.linear.x = 0.1
+    if(left):
+        twist.angular.z = 1.5
+    else:
+        rospy.sleep(3)
+        twist.angular.z = -1.5
+    self.cmd_vel_pub.publish(twist)
+    rospy.sleep(1)
+
 
   def stop_turn(self):
     twist = Twist()

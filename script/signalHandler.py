@@ -26,7 +26,6 @@ class Signal:
         self.pink_y = None
         self.max_yellow = 0
         self.yellow_x = None
-
         self.yellow_y = None
 
         self.seen = None
@@ -39,17 +38,22 @@ class Signal:
         image = self.bridge.imgmsg_to_cv2(image,desired_encoding='bgr8')
         hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 
+        h, w, d = image.shape
+        search_top = int(h/3)
+
         # Set range for pink color and
         # define mask
         pink_lower = np.array([135, 70, 150], np.uint8)
         pink_upper = np.array([180, 255, 255], np.uint8)
         pink_mask = cv2.inRange(hsv, pink_lower, pink_upper)
+        pink_mask[0:search_top, 0:w] = 0 
 
         # Set range for yellow color and
         # define mask
         yellow_lower = np.array([20, 150, 100], np.uint8)
         yellow_upper = np.array([40, 255, 255], np.uint8)
         yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+        yellow_mask[0:search_top, 0:w] = 0 
 
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
 
@@ -62,7 +66,6 @@ class Signal:
         yellow_mask = cv2.dilate(yellow_mask, kernel)
         res_yellow = cv2.bitwise_and(image, image,
                                      mask = yellow_mask)
-
 
         # Creating contour to track pink color
         img, contours, hierarchy = cv2.findContours(pink_mask,
@@ -106,17 +109,27 @@ class Signal:
                     self.yellow_x = x
                     self.yellow_y = y
                     self.max_yellow = area
+
         left = None
         if(self.max_pink > 0 and self.max_yellow > 0):
+            print(self.yellow_y, self.pink_y)
             if(self.yellow_y > self.pink_y):
-                #print("Turn left")
                 self.pub.publish("left")
             else:
-                #print("Turn right")
                 self.pub.publish("right")
         else:
-            self.pub.publish("Non")
-        #cv2.imshow('color',image)
+            self.pub.publish("None")
+        cv2.imshow('color',image)
+        '''
+        if(self.max_pink > 0 and self.max_blue > 0 and self.max_yellow > 0):
+            self.pub.publish("right")
+        elif(self.max_pink > 0 and self.max_blue > 0):
+            self.pub.publish("left")
+        elif(self.max_pink > 0 and self.max_yellow > 0):
+            self.pub.publish("right")
+        else:
+            self.pub.publish("None")'''
+        cv2.imshow('color',image)
         cv2.waitKey(3)
 
 if __name__=='__main__':
