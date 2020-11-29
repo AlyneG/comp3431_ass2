@@ -120,16 +120,6 @@ class Signal:
         else:
             self.pub.publish("None")
         cv2.imshow('color',image)
-        '''
-        if(self.max_pink > 0 and self.max_blue > 0 and self.max_yellow > 0):
-            self.pub.publish("right")
-        elif(self.max_pink > 0 and self.max_blue > 0):
-            self.pub.publish("left")
-        elif(self.max_pink > 0 and self.max_yellow > 0):
-            self.pub.publish("right")
-        else:
-            self.pub.publish("None")'''
-        cv2.imshow('color',image)
         cv2.waitKey(3)
 
 if __name__=='__main__':
@@ -137,25 +127,3 @@ if __name__=='__main__':
     signal = Signal()
     rospy.spin()
 
-
-
-'''
-listener = tf.TransformListener()
-listener.waitForTransform("/odom", "/map", rospy.Time(0), rospy.Duration(3))
-position, orientation = listener.lookupTransform('/odom', '/map', rospy.Time(0))
-client = actionlib.SimpleActionClient('move_base',MoveBaseAction)
-client.wait_for_server()
-
-goal = MoveBaseGoal()
-goal.target_pose.header.frame_id = "map"
-goal.target_pose.header.stamp = rospy.Time.now()
-goal.target_pose.pose.position.x = position[-1]
-goal.target_pose.pose.position.y = position[-1] + 0.1
-goal.target_pose.pose.position.z = position[-1] + 0.5
-
-goal.target_pose.pose.orientation.w = 1.0
-client.send_goal(goal)
-client.wait_for_result()
-rospy.init_node('turn')
-inters = Signal()
-rospy.spin()'''
